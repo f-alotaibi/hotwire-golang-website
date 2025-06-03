@@ -13,6 +13,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
+	"github.com/wolfeidau/hotwire-golang-website/utils"
+	"github.com/wolfeidau/hotwire-golang-website/views/messages"
+	viewTemplates "github.com/wolfeidau/hotwire-golang-website/views/templates"
 )
 
 const (
@@ -33,16 +36,14 @@ func NewHotwire() *Hotwire {
 
 // Index using a template build the index page
 func (hw *Hotwire) Index(c echo.Context) error {
-	return c.Render(http.StatusOK, "index.html", nil)
+	return utils.RenderView(c, viewTemplates.Index())
 }
 
 // Greeting process greetings using a query parameter
 func (hw *Hotwire) Greeting(c echo.Context) error {
 	name := c.QueryParam("person")
 
-	return c.Render(http.StatusOK, "greeting.html", map[string]interface{}{
-		"person": name,
-	})
+	return utils.RenderView(c, viewTemplates.Greeting(name))
 }
 
 // Pinger process form POSTs which are either returned as a partial or full page dependending on the media type
@@ -58,19 +59,15 @@ func (hw *Hotwire) Pinger(c echo.Context) error {
 
 		c.Response().Header().Set(echo.HeaderContentType, turboStreamMedia)
 
-		return c.Render(http.StatusOK, "ping.turbo-stream.html", map[string]interface{}{
-			"pingTime": 0,
-		})
+		return utils.RenderView(c, messages.Ping(0))
 	}
 
-	return c.Render(http.StatusOK, "ping.html", map[string]interface{}{
-		"pingTime": 0,
-	})
+	return utils.RenderView(c, viewTemplates.Ping(0))
 }
 
 // Memory uses websockets
 func (hw *Hotwire) Memory(c echo.Context) error {
-
+	req := c.Request()
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err
@@ -86,7 +83,7 @@ func (hw *Hotwire) Memory(c echo.Context) error {
 
 		runtime.ReadMemStats(mstats)
 
-		err := c.Echo().Renderer.Render(buf, "memory.turbo-stream.html", mstats, c)
+		err := messages.Memory(mstats).Render(req.Context(), buf)
 		if err != nil {
 			log.Ctx(c.Request().Context()).Error().Err(err).Msg("failed to build message")
 			break
@@ -128,10 +125,7 @@ func (hw *Hotwire) Load(c echo.Context) error {
 
 			buf := new(bytes.Buffer)
 
-			err := c.Echo().Renderer.Render(buf, "load.turbo-stream.html", map[string]interface{}{
-				"at":  t.Format("15:04:05"),
-				"avg": runtime.NumGoroutine(),
-			}, c)
+			err := messages.Load(t.Format("15:04:05"), runtime.NumGoroutine()).Render(req.Context(), buf)
 			if err != nil {
 				return c.NoContent(http.StatusInternalServerError)
 			}

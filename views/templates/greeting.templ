@@ -1,0 +1,15 @@
+package templates
+
+import "github.com/wolfeidau/hotwire-golang-website/views/layouts"
+
+templ Greeting(personName string) {
+    @layouts.Base("Hotwire", nil) {
+        <h1>The Greeting Page</h1>
+        <turbo-frame id="greeting_frame">
+            <p>
+                <span id="hello">Hello</span>,
+                <span id="person">{ personName }</span>!
+            </p>
+        </turbo-frame>
+    }
+}

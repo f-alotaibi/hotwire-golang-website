@@ -9,3 +9,4 @@
 /*.sarif
 /.certs
 node_modules/
+*_templ.go

@@ -1,0 +1,28 @@
+package messages
+
+import "time"
+import "runtime"
+
+templ Load(at string, avg int) {
+    <turbo-stream action="replace" target="load">
+        <template>
+            <span id="load">{ at }: { avg }</span>
+        </template>
+    </turbo-stream>
+}
+
+templ Memory(memStats *runtime.MemStats) {
+    <turbo-stream action="replace" target="memory">
+        <template>
+            <span id="memory">{ time.Now().Format("15:04:05") }: { memStats.Alloc }: { memStats.TotalAlloc }</span>
+        </template>
+    </turbo-stream>
+}
+
+templ Ping(pingTime int) {
+    <turbo-stream action="append" target="pings">
+        <template>
+            <li>{ pingTime }</li>
+        </template>
+    </turbo-stream>
+}

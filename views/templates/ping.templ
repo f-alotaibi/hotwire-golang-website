@@ -1,0 +1,13 @@
+package templates
+
+import "github.com/wolfeidau/hotwire-golang-website/views/layouts"
+
+templ Ping(pingTime int) {
+    @layouts.Base("Hotwire", nil) {
+        <h1>The Ping Page</h1>
+        <p>
+            Ping Time: <span id="pingTime">{ pingTime }</span>!
+        </p>
+        <a href="javascript:history.back()">🔙 Back</a>
+    }
+}

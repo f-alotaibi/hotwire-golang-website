@@ -13,12 +13,10 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	assets "github.com/wolfeidau/echo-esbuild-middleware"
-	templates "github.com/wolfeidau/echo-go-templates"
 	middleware "github.com/wolfeidau/echo-middleware"
 	"github.com/wolfeidau/hotwire-golang-website/internal/app"
 	"github.com/wolfeidau/hotwire-golang-website/internal/flags"
 	"github.com/wolfeidau/hotwire-golang-website/internal/server"
-	"github.com/wolfeidau/hotwire-golang-website/views"
 )
 
 var cfg = new(flags.ServerAPI)
@@ -31,20 +29,6 @@ func main() {
 	flds := map[string]interface{}{"commit": app.Commit, "buildDate": app.BuildDate}
 
 	e := echo.New()
-
-	render := templates.New()
-
-	err := render.AddWithLayout(views.Content, "layouts/base.html", "templates/*.html")
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load render")
-	}
-
-	err = render.Add(views.Content, "messages/*.html")
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load render")
-	}
-
-	e.Renderer = render
 
 	e.Logger.SetOutput(io.Discard)
 
